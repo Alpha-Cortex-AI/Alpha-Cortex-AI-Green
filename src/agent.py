@@ -225,7 +225,14 @@ Example format: {{"categories": ["Market Risk", "Operational Risk"]}}
             return []
         
         if isinstance(result, dict):
-            categories = result.get("categories", result.get("risk_categories", []))
+            # Try multiple common keys the LLM might use
+            categories = (
+                result.get("categories") or 
+                result.get("risk_categories") or 
+                result.get("risks") or 
+                result.get("risk_classification") or 
+                []
+            )
         else:
             categories = result
 
@@ -580,7 +587,8 @@ Analyze the following Risk Factors section and classify the main risk categories
 Risk Factors (Section 1A):
 {section_1a}
 
-Categories: Market Risk, Operational Risk, Financial Risk, Legal/Regulatory Risk, Technology Risk, Cybersecurity Risk, Competition Risk, Supply Chain Risk, Human Capital/Talent Risk, Environmental/Climate Risk, COVID-19/Pandemic Risk, Geopolitational Risk
+Choose from the following categories. If a risk doesn't fit, do not include it.
+Categories: Market Risk, Operational Risk, Financial Risk, Legal/Regulatory Risk, Technology Risk, Cybersecurity Risk, Competition Risk, Supply Chain Risk, Human Capital/Talent Risk, Environmental/Climate Risk, COVID-19/Pandemic Risk, Geopolitical Risk
 
 Return JSON: {{"risk_classification": ["category1", "category2", ...]}}
 """
